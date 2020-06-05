@@ -1,0 +1,50 @@
+{% include 'overall_header.html' %}
+
+<h1>{{ lang('ACP_WATERMARK_TITLE') }}</h1>
+
+<p><img src="https://img.shields.io/badge/{{ lang('Version') }}-{{ WATERMARK_VERSION }}-green.svg?style=plastic" /></p>
+
+{% if S_ERROR %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ ERROR_MSG }}</p>
+	</div>
+{% endif %}
+
+<form id="dmzx_watermark_acp" name="dmzx_watermark_acp" method="post" action="{{ U_ACTION }}"	enctype="multipart/form-data">
+	<fieldset>
+		<legend>{{ lang('SETTINGS') }}</legend>
+		<dl>
+			<dt><label for="watermark_enable">{{ lang('ACP_WATERMARK_ENABLE') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_ENABLE_EXPLAIN') }}</span></dt>
+			<dd>
+				<label><input type="radio" class="radio" name="watermark_enable" value="1"{% if WATERMARK_ENABLE %} id="watermark_enable" checked="checked"{% endif %} /> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="watermark_enable" value="0"{% if not WATERMARK_ENABLE %} id="watermark_enable" checked="checked"{% endif %} /> {{ lang('NO') }}</label>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="watermark_logo_upload">{{ lang('ACP_WATERMARK_LOGO_UPLOAD') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_LOGO_UPLOAD_EXPLAIN') }}</span></dt>
+			<dd><input type="file" name="watermark_logo_upload" id="watermark_logo_upload"></dd>
+		</dl>
+		<dl>
+			<dt><label for="watermark_file">{{ lang('ACP_WATERMARK_FILE') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_FILE_EXPLAIN') }}</span></dt>
+			<dd><input type="text" id="watermark_file" name="watermark_file" value="{{ WATERMARK_FILE }}" size="40" maxlength="255" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="watermark_scale">{{ lang('ACP_WATERMARK_SCALE') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_SCALE_EXPLAIN') }}</span></dt>
+			<dd><input type="number" id="watermark_scale" name="watermark_scale" value="{{ WATERMARK_SCALE }}" size="1" maxlength="1" min="1" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="watermark_img_folder">{{ lang('ACP_WATERMARK_IMG_FOLDER') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_IMG_FOLDER_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="keyword" type="text" name="watermark_img_folder" id="watermark_img_folder" value="{{ WATERMARK_IMG_FOLDER }}" minlength="3" required title="{{ lang('ACP_WATERMARK_IMG_FOLDER') }}" />
+				<input type="hidden" name="watermarkimgfolder" value="watermark_img_folder" />
+			</dd>
+		</dl>
+	</fieldset>
+	<fieldset class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
+
+{% include 'overall_footer.html' %}
