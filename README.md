@@ -1,6 +1,6 @@
 # Watermark Extension
 
-[![Build Status](https://travis-ci.org/dmzx/Watermark?branch=master)](https://travis-ci.org/dmzx/Watermark)
+[![Build Status](https://travis-ci.org/dmzx/Watermark.svg?branch=master)](https://travis-ci.org/dmzx/Watermark)
 
 ## Install
 1. Download the latest release.
