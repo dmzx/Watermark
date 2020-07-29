@@ -118,6 +118,8 @@ class acp_controller
 				$this->config->set('watermark_enable', $this->request->variable('watermark_enable', ''));
 				$this->config->set('watermark_file', $this->request->variable('watermark_file', ''));
 				$this->config->set('watermark_scale', $this->request->variable('watermark_scale', 0));
+				$this->config->set('watermark_location', $this->request->variable('watermark_location', 0));
+				$this->config->set('watermark_level', $this->request->variable('watermark_level', 0));
 
 				$file = $this->request->file('watermark_logo_upload');
 
@@ -155,6 +157,8 @@ class acp_controller
 			'WATERMARK_FILE'				=> $this->config['watermark_file'],
 			'WATERMARK_SCALE'				=> $this->config['watermark_scale'],
 			'WATERMARK_VERSION'				=> $this->config['watermark_version'],
+			'WATERMARK_LOCATION'			=> $this->config['watermark_location'],
+			'WATERMARK_LEVEL'				=> $this->config['watermark_level'],
 			'U_ACTION'						=> $this->u_action,
 		]);
 	}

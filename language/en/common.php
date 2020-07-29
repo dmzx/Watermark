@@ -48,4 +48,13 @@ $lang = array_merge($lang, [
 	'ACP_WATERMARK_SCALE_EXPLAIN'			=> 'Set scale of watermark image.<br>Default value is 2.',
 	'ACP_WATERMARK_IMG_FOLDER'				=> 'Rename watermark image folder',
 	'ACP_WATERMARK_IMG_FOLDER_EXPLAIN'		=> 'Rename watermark image folder in the root folder images.<br>Minimum length 3 characters.',
+	'ACP_WATERMARK_LOCATION'				=> 'Position',
+	'ACP_WATERMARK_LOCATION_EXPLAIN'		=> 'Position of the watermark image.',
+	'ACP_WATERMARK_LEVEL'					=> 'Transparency',
+	'ACP_WATERMARK_LEVEL_EXPLAIN'			=> 'Transparency level of watermark image.<br>Default value is 100%',
+	'ACP_WATERMARK_LOCATION_0'				=> 'Top left',
+	'ACP_WATERMARK_LOCATION_1'				=> 'Top right',
+	'ACP_WATERMARK_LOCATION_2'				=> 'Bottom left',
+	'ACP_WATERMARK_LOCATION_3'				=> 'Bottom right',
+	'ACP_WATERMARK_LOCATION_4'				=> 'Center',
 ]);

@@ -92,13 +92,39 @@ class main_listener implements EventSubscriberInterface
 
 			$watermark_mini = ImageCreateTrueColor($w, $h);
 			imagealphablending($watermark_mini, false);
-			imagesavealpha($watermark_mini,true);
+			imagesavealpha($watermark_mini, true);
 			ImageCopyResampled ($watermark_mini, $watermark, 0, 0, 0, 0, $w, $h, $orig_watermark_x, $orig_watermark_y);
 
-			$dest_x = $im_x - $w - 5;
-			$dest_y = $im_y - $h - 5;
+			$dest_x = $im_x - $w;
+			$dest_y = $im_y - $h;
+			$location = $this->config['watermark_location'];
+			$level = $this->config['watermark_level'];
 
-			imagecopy($image, $watermark_mini, $dest_x,$dest_y , 0, 0, $w, $h);
+			if ($location == 0)
+			{
+				// top-left
+				$this->imagecopymerge_watermark($image, $watermark_mini, 0, 0, 0, 0, $w, $h, $level);
+			}
+			else if ($location == 1)
+			{
+				// top-right
+				$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x + 0, 0, 0, 0, $w, $h, $level);
+			}
+			else if ($location == 2)
+			{
+				// bottom-left
+				$this->imagecopymerge_watermark($image, $watermark_mini, 0, $dest_y + 5, 0, 0, $w, $h, $level);
+			}
+			else if ($location == 3)
+			{
+				// bottom-right
+				$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y + 5, 0, 0, $w, $h, $level);
+			}
+			else
+			{
+				// center
+				$this->imagecopymerge_watermark($image, $watermark_mini, ($dest_x)/2, ($dest_y)/2, 0, 0, $w, $h, $level);
+			}
 
 			$this->image_write($event, $image);
 
@@ -111,6 +137,58 @@ class main_listener implements EventSubscriberInterface
 			$filedata['filesize'] = @filesize($this->root_path . $this->config['upload_path'] . '/' . $filedata['physical_filename']);
 			$event['filedata'] = $filedata;
 		}
+	}
+
+	private function imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y, $src_x, $src_y, $w, $h, $level)
+	{
+		$level /= 100;
+
+		$w = imagesx($watermark_mini);
+		$h = imagesy($watermark_mini);
+
+		imagealphablending($watermark_mini, false);
+
+		$minalpha = 127;
+		for ($x = 0; $x < $w; $x++)
+		{
+			for ($y = 0; $y < $h; $y++)
+			{
+				$alpha = (imagecolorat($watermark_mini, $x, $y) >> 24) & 0xFF;
+
+				if ($alpha < $minalpha)
+				{
+					$minalpha = $alpha;
+				}
+			}
+		}
+
+		for ($x = 0; $x < $w; $x++)
+		{
+			for ($y = 0; $y < $h; $y++)
+			{
+				$colorxy = imagecolorat($watermark_mini, $x, $y);
+				$alpha = ($colorxy >> 24) & 0xFF;
+
+				if ($minalpha !== 127)
+				{
+					$alpha = 127 + 127 * $level * ($alpha - 127) / (127 - $minalpha);
+				}
+				else
+				{
+					$alpha += 127 * $level;
+				}
+
+				$alphacolorxy = imagecolorallocatealpha($watermark_mini, ($colorxy >> 16) & 0xFF, ($colorxy >> 8) & 0xFF, $colorxy & 0xFF, $alpha);
+
+				if (!imagesetpixel($watermark_mini, $x, $y, $alphacolorxy))
+				{
+					return false;
+				}
+			}
+		}
+
+		imagecopy($image, $watermark_mini, $dest_x, $dest_y, $src_x, $src_y, $w, $h);
+		return true;
 	}
 
 	private function image_get($event)

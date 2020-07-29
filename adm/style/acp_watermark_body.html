@@ -34,6 +34,22 @@
 			<dd><input type="number" id="watermark_scale" name="watermark_scale" value="{{ WATERMARK_SCALE }}" size="1" maxlength="1" min="1" /></dd>
 		</dl>
 		<dl>
+			<dt><label for="watermark_level">{{ lang('ACP_WATERMARK_LEVEL') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_LEVEL_EXPLAIN') }}</span></dt>
+			<dd><input type="number" id="watermark_level" name="watermark_level" value="{{ WATERMARK_LEVEL }}" size="1" min="1" max="100"/></dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('ACP_WATERMARK_LOCATION') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_LOCATION_EXPLAIN') }}</span></dt>
+			<dd>
+				<select name="watermark_location">
+					<option id="watermark_location_0" value="0" {% if WATERMARK_LOCATION == 0 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_0') }}</option>
+					<option id="watermark_location_1" value="1" {% if WATERMARK_LOCATION == 1 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_1') }}</option>
+					<option id="watermark_location_2" value="2" {% if WATERMARK_LOCATION == 2 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_2') }}</option>
+					<option id="watermark_location_3" value="3" {% if WATERMARK_LOCATION == 3 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_3') }}</option>
+					<option id="watermark_location_4" value="4" {% if WATERMARK_LOCATION == 4 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_4') }}</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
 			<dt><label for="watermark_img_folder">{{ lang('ACP_WATERMARK_IMG_FOLDER') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_IMG_FOLDER_EXPLAIN') }}</span></dt>
 			<dd>
 				<input class="keyword" type="text" name="watermark_img_folder" id="watermark_img_folder" value="{{ WATERMARK_IMG_FOLDER }}" minlength="3" required title="{{ lang('ACP_WATERMARK_IMG_FOLDER') }}" />
