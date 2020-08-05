@@ -80,7 +80,8 @@ class main_listener implements EventSubscriberInterface
 			}
 
 			$watermark = imagecreatefrompng($image_path . $this->config['watermark_file']);
-
+			$transColor = imagecolorallocatealpha($watermark, 255, 255, 255, 127);
+			$watermark = imagerotate($watermark, $this->config['watermark_orientation'], $transColor);
 			$image = $this->image_get($event);
 			$orig_watermark_x = imagesx($watermark);
 			$orig_watermark_y = imagesy($watermark);
@@ -90,10 +91,10 @@ class main_listener implements EventSubscriberInterface
 			$w = intval($orig_watermark_x * $cof);
 			$h = intval($orig_watermark_y * $cof);
 
-			$watermark_mini = ImageCreateTrueColor($w, $h);
+			$watermark_mini = imagecreatetruecolor($w, $h);
 			imagealphablending($watermark_mini, false);
 			imagesavealpha($watermark_mini, true);
-			ImageCopyResampled ($watermark_mini, $watermark, 0, 0, 0, 0, $w, $h, $orig_watermark_x, $orig_watermark_y);
+			imagecopyresampled($watermark_mini, $watermark, 0, 0, 0, 0, $w, $h, $orig_watermark_x, $orig_watermark_y);
 
 			$dest_x = $im_x - $w;
 			$dest_y = $im_y - $h;
@@ -142,13 +143,8 @@ class main_listener implements EventSubscriberInterface
 	private function imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y, $src_x, $src_y, $w, $h, $level)
 	{
 		$level /= 100;
-
-		$w = imagesx($watermark_mini);
-		$h = imagesy($watermark_mini);
-
-		imagealphablending($watermark_mini, false);
-
 		$minalpha = 127;
+
 		for ($x = 0; $x < $w; $x++)
 		{
 			for ($y = 0; $y < $h; $y++)
