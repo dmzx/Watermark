@@ -56,7 +56,7 @@ class acp_controller
 	 */
 	public function __construct(
 		\phpbb\config\config $config,
-		 \phpbb\language\language $language,
+		\phpbb\language\language $language,
 		\phpbb\log\log $log,
 		\phpbb\request\request $request,
 		\phpbb\template\template $template,

@@ -1,5 +1,10 @@
 ## Watermark Changelog
 
+### 1.0.3 - 2021-05-03
+
+- Added support for webp images.
+- Added code for check mimetype.
+
 ### 1.0.2 - 2020-08-05
 
 - Added orientation of watermark.

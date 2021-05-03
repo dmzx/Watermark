@@ -59,7 +59,7 @@ class main_listener implements EventSubscriberInterface
 			$corrected_path = $this->path_helper->get_web_root_path();
 			$image_path = ((defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : $corrected_path) . 'images/' . $this->config['watermark_img_folder'] . '/';
 
-			if (!$event['is_image'] || !$event['filedata']['post_attach'])
+			if (!$event['is_image'] || !$event['filedata']['post_attach'] || !$this->supportCheck($event['filedata']['mimetype']))
 			{
 				return;
 			}
@@ -204,6 +204,10 @@ class main_listener implements EventSubscriberInterface
 				$image = imagecreatefromgif($this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
 			break;
 
+			case 'image/webp':
+				$image = imagecreatefromwebp($this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
+			break;
+
 			default:
 			break;
 		}
@@ -227,9 +231,30 @@ class main_listener implements EventSubscriberInterface
 				imagegif($image, $this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
 			break;
 
+			case 'image/webp':
+				imagewebp($image, $this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
+			break;
+
 			default:
 			break;
 		}
 		imagedestroy($image);
+	}
+
+	private function supportCheck($mimetype)
+	{
+		switch ($mimetype)
+		{
+			case 'image/png':
+			case 'image/jpeg':
+			case 'image/gif':
+			case 'image/webp':
+				return true;
+				break;
+
+			default:
+				return false;
+				break;
+		}
 	}
 }
