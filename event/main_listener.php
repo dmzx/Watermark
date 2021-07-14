@@ -189,7 +189,7 @@ class main_listener implements EventSubscriberInterface
 
 	private function image_get($event)
 	{
-		switch($event['filedata']['mimetype'])
+		switch ($event['filedata']['mimetype'])
 		{
 			case 'image/png':
 				$image = imagecreatefrompng($this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
@@ -216,7 +216,7 @@ class main_listener implements EventSubscriberInterface
 
 	private function image_write($event, $image)
 	{
-		switch($event['filedata']['mimetype'])
+		switch ($event['filedata']['mimetype'])
 		{
 			case 'image/png':
 				imagepng($image, $this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
