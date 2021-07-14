@@ -1,6 +1,6 @@
 # Watermark Extension
 
-[![Build Status](https://travis-ci.org/dmzx/Watermark.svg?branch=master)](https://travis-ci.org/dmzx/Watermark)
+[![Build Status](https://github.com/dmzx/Watermark/workflows/Tests/badge.svg)](https://github.com/phpbb-extensions/dmzx/Watermark)
 
 ## Install
 1. Download the latest release.
