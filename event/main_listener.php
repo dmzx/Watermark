@@ -10,6 +10,10 @@
 
 namespace dmzx\watermark\event;
 
+use phpbb\config\config;
+use phpbb\path_helper;
+use phpbb\auth\auth;
+use phpbb\db\driver\driver_interface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -17,127 +21,169 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class main_listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 
-	/** @var \phpbb\path_helper */
+	/** @var path_helper */
 	protected $path_helper;
+
+	/** @var auth */
+	protected $auth;
+
+	/** @var driver_interface */
+	protected $db;
+
+	/** @var string */
+	protected $tables;
 
 	/** @var string phpBB root path */
 	protected $root_path;
 
+	/** @var	*/
+	protected $watermark_exclude = false;
+
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbb\config\config		$config		Config object
-	 * @param \phpbb\path_helper 		$path_helper phpBB path helper
-	 * @param string					$root_path	phpBB root path
+	 * @param config					$config
+	 * @param path_helper 				$path_helper
+	 * @param auth			 			$auth
+	 * @param driver_interface 			$db
+	 * @param tables					$tables
+	 * @param string					$root_path
 	 */
 	public function __construct(
-		\phpbb\config\config $config,
-		\phpbb\path_helper $path_helper,
+		config $config,
+		path_helper $path_helper,
+		auth $auth,
+		driver_interface $db,
+		array $tables,
 		string $root_path
 	)
 	{
-		$this->config = $config;
-		$this->path_helper = $path_helper;
-		$this->root_path = $root_path;
+		$this->config 		= $config;
+		$this->path_helper 	= $path_helper;
+		$this->auth 		= $auth;
+		$this->db 			= $db;
+		$this->tables		= $tables;
+		$this->root_path 	= $root_path;
 	}
 
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.modify_uploaded_file'		=> 'modify_uploaded_file',
+			'core.modify_posting_parameters'		=> 'modify_posting_parameters',
+			'core.modify_uploaded_file'				=> 'modify_uploaded_file',
 		];
+	}
+
+	public function modify_posting_parameters($event)
+	{
+		$forum_id = $event['forum_id'];
+
+		if ($this->is_forum_excluded($forum_id) == true)
+		{
+			$this->watermark_exclude = true;
+		}
 	}
 
 	public function modify_uploaded_file($event)
 	{
-		if ($this->config['watermark_enable'])
+		if ($this->config['watermark_enable'] && $this->watermark_exclude == true)
 		{
-			$board_url = generate_board_url() . '/';
-			$corrected_path = $this->path_helper->get_web_root_path();
-			$image_path = ((defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : $corrected_path) . 'images/' . $this->config['watermark_img_folder'] . '/';
-
-			if (!$event['is_image'] || !$event['filedata']['post_attach'] || !$this->supportCheck($event['filedata']['mimetype']))
-			{
-				return;
-			}
-
-			if (!@extension_loaded('gd'))
-			{
-				return;
-			}
-
-			if (empty($this->config['watermark_file']))
-			{
-				return;
-			}
-
-			if (!file_exists($image_path . $this->config['watermark_file']))
-			{
-				return;
-			}
-
-			$watermark = imagecreatefrompng($image_path . $this->config['watermark_file']);
-			$transColor = imagecolorallocatealpha($watermark, 255, 255, 255, 127);
-			$watermark = imagerotate($watermark, $this->config['watermark_orientation'], $transColor);
-			$image = $this->image_get($event);
-			$orig_watermark_x = imagesx($watermark);
-			$orig_watermark_y = imagesy($watermark);
-			$im_x = imagesx($image);
-			$im_y = imagesy($image);
-			$cof = $im_x / ($orig_watermark_x * $this->config['watermark_scale']);
-			$w = intval($orig_watermark_x * $cof);
-			$h = intval($orig_watermark_y * $cof);
-
-			$watermark_mini = imagecreatetruecolor($w, $h);
-			imagealphablending($watermark_mini, false);
-			imagesavealpha($watermark_mini, true);
-			imagecopyresampled($watermark_mini, $watermark, 0, 0, 0, 0, $w, $h, $orig_watermark_x, $orig_watermark_y);
-
-			$dest_x = $im_x - $w;
-			$dest_y = $im_y - $h;
-			$location = $this->config['watermark_location'];
-			$level = $this->config['watermark_level'];
-
-			if ($location == 0)
-			{
-				// top-left
-				$this->imagecopymerge_watermark($image, $watermark_mini, 0, 0, 0, 0, $w, $h, $level);
-			}
-			else if ($location == 1)
-			{
-				// top-right
-				$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x + 0, 0, 0, 0, $w, $h, $level);
-			}
-			else if ($location == 2)
-			{
-				// bottom-left
-				$this->imagecopymerge_watermark($image, $watermark_mini, 0, $dest_y + 5, 0, 0, $w, $h, $level);
-			}
-			else if ($location == 3)
-			{
-				// bottom-right
-				$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y + 5, 0, 0, $w, $h, $level);
-			}
-			else
-			{
-				// center
-				$this->imagecopymerge_watermark($image, $watermark_mini, ($dest_x)/2, ($dest_y)/2, 0, 0, $w, $h, $level);
-			}
-
-			$this->image_write($event, $image);
-
-			imagedestroy($watermark);
-
-			$filedata = $event['filedata'];
-
-			clearstatcache();
-
-			$filedata['filesize'] = @filesize($this->root_path . $this->config['upload_path'] . '/' . $filedata['physical_filename']);
-			$event['filedata'] = $filedata;
+			return;
 		}
+
+		$board_url = generate_board_url() . '/';
+		$corrected_path = $this->path_helper->get_web_root_path();
+		$image_path = ((defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : $corrected_path) . 'images/' . $this->config['watermark_img_folder'] . '/';
+
+		if (!$event['is_image'] || !$event['filedata']['post_attach'] || !$this->supportCheck($event['filedata']['mimetype']))
+		{
+			return;
+		}
+
+		if (!@extension_loaded('gd'))
+		{
+			return;
+		}
+
+		if (empty($this->config['watermark_file']))
+		{
+			return;
+		}
+
+		if (!file_exists($image_path . $this->config['watermark_file']))
+		{
+			return;
+		}
+
+		$watermark = imagecreatefrompng($image_path . $this->config['watermark_file']);
+		$transColor = imagecolorallocatealpha($watermark, 255, 255, 255, 127);
+		$watermark = imagerotate($watermark, $this->config['watermark_orientation'], $transColor);
+		$image = $this->image_get($event);
+		$orig_watermark_x = imagesx($watermark);
+		$orig_watermark_y = imagesy($watermark);
+		$im_x = imagesx($image);
+		$im_y = imagesy($image);
+		$cof = $im_x / ($orig_watermark_x * $this->config['watermark_scale']);
+		$w = intval($orig_watermark_x * $cof);
+		$h = intval($orig_watermark_y * $cof);
+
+		$watermark_mini = imagecreatetruecolor($w, $h);
+		imagealphablending($watermark_mini, false);
+		imagesavealpha($watermark_mini, true);
+		imagecopyresampled($watermark_mini, $watermark, 0, 0, 0, 0, $w, $h, $orig_watermark_x, $orig_watermark_y);
+
+		$dest_x = $im_x - $w;
+		$dest_y = $im_y - $h;
+		$location = $this->config['watermark_location'];
+		$level = $this->config['watermark_level'];
+
+		if ($location == 0)
+		{
+			// top-left
+			$this->imagecopymerge_watermark($image, $watermark_mini, 0, 0, 0, 0, $w, $h, $level);
+		}
+		else if ($location == 1)
+		{
+			// top-right
+			$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x + 0, 0, 0, 0, $w, $h, $level);
+		}
+		else if ($location == 2)
+		{
+			// bottom-left
+			$this->imagecopymerge_watermark($image, $watermark_mini, 0, $dest_y + 5, 0, 0, $w, $h, $level);
+		}
+		else if ($location == 3)
+		{
+			// bottom-right
+			$this->imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y + 5, 0, 0, $w, $h, $level);
+		}
+		else
+		{
+			// center
+			$this->imagecopymerge_watermark($image, $watermark_mini, ($dest_x)/2, ($dest_y)/2, 0, 0, $w, $h, $level);
+		}
+
+		$this->image_write($event, $image);
+
+		imagedestroy($watermark);
+
+		$filedata = $event['filedata'];
+
+		clearstatcache();
+
+		$filedata['filesize'] = @filesize($this->root_path . $this->config['upload_path'] . '/' . $filedata['physical_filename']);
+		$event['filedata'] = $filedata;
+
+	}
+
+	private function is_forum_excluded($forum_id)
+	{
+		$forums_excluded = preg_split("/[\s,]+/", $this->config['watermark_forum_excluded']);
+
+		return in_array($forum_id, $forums_excluded);
 	}
 
 	private function imagecopymerge_watermark($image, $watermark_mini, $dest_x, $dest_y, $src_x, $src_y, $w, $h, $level)
@@ -189,7 +235,7 @@ class main_listener implements EventSubscriberInterface
 
 	private function image_get($event)
 	{
-		switch ($event['filedata']['mimetype'])
+		switch($event['filedata']['mimetype'])
 		{
 			case 'image/png':
 				$image = imagecreatefrompng($this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);
@@ -216,7 +262,7 @@ class main_listener implements EventSubscriberInterface
 
 	private function image_write($event, $image)
 	{
-		switch ($event['filedata']['mimetype'])
+		switch($event['filedata']['mimetype'])
 		{
 			case 'image/png':
 				imagepng($image, $this->root_path . $this->config['upload_path'] . '/' . $event['filedata']['physical_filename']);

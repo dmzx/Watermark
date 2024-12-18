@@ -3,8 +3,8 @@
 	"type": "phpbb-extension",
 	"description": "Watermark automatically images by upload.",
 	"homepage": "https://www.dmzx-web.net",
-	"version": "1.0.4",
-	"time": "2024-11-29",
+	"version": "1.0.3",
+	"time": "2021-05-03",
 	"keywords": [
 		"phpbb",
 		"extension",

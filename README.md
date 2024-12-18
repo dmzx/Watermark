@@ -1,7 +1,6 @@
 # Watermark Extension
 
-[![Build Status](https://github.com/dmzx/Watermark/workflows/Tests/badge.svg)](https://github.com/phpbb-extensions/dmzx/Watermark)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/31d7a4440b5547d7a5397a5246f9c9d1)](https://www.codacy.com/gh/dmzx/Watermark/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dmzx/Watermark&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/dmzx/Watermark.svg?branch=master)](https://travis-ci.org/dmzx/Watermark)
 
 ## Install
 1. Download the latest release.

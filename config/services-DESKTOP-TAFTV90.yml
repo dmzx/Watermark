@@ -3,7 +3,6 @@ services:
         autowire: true
         bind:
             $root_path: '%core.root_path%'
-            $tables: '%tables%'
     dmzx.watermark.listener:
         class: dmzx\watermark\event\main_listener
         tags: [{ name: event.listener }]

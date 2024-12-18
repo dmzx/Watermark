@@ -84,13 +84,10 @@ class acp_controller
 	public function display_options()
 	{
 		// Add our common language file
-		$this->language->add_lang('acp_watermark', 'dmzx/watermark');
+		$this->language->add_lang('common', 'dmzx/watermark');
 
 		// Create a form key for preventing CSRF attacks
 		add_form_key('dmzx_watermark_acp');
-
-		// get the excluded forums
-		$excluded_forums = explode(',', $this->config['watermark_forum_excluded']);
 
 		// Create an array to collect errors that will be output to the user
 		$errors = [];
@@ -125,18 +122,11 @@ class acp_controller
 				$this->config->set('watermark_level', $this->request->variable('watermark_level', 0));
 				$this->config->set('watermark_orientation', $this->request->variable('watermark_orientation', 0));
 
-				// variable should be '' as it is a string ("1, 2, 3928") here, not an integer.
-				$forums = $this->request->variable('selectForms',	['']);
-				// change the array to a string
-				$forums	= implode(',', $forums);
-				$this->config->set('watermark_forum_excluded', $forums);
-
 				$file = $this->request->file('watermark_logo_upload');
 
 				if ($file['error'] == UPLOAD_ERR_OK)
 				{
 					$destination = $image_path;
-
 					if (!$this->upload($file, $destination))
 					{
 						trigger_error($this->language->lang('ACP_WATERMARK_ERROR', $file['name']) . adm_back_link($this->u_action), E_USER_WARNING);
@@ -159,17 +149,10 @@ class acp_controller
 
 		$s_errors = !empty($errors);
 
-		$watermark_gd_warning = '';
-
-		if (!@extension_loaded('gd'))
-		{
-			$watermark_gd_warning = true;
-		}
-
 		// Set output variables for display in the template
 		$this->template->assign_vars([
 			'S_ERROR'						=> $s_errors,
-			'ERROR_MSG'						=> $s_errors ? implode('<br>', $errors) : '',
+			'ERROR_MSG'						=> $s_errors ? implode('<br />', $errors) : '',
 			'WATERMARK_ENABLE'				=> $this->config['watermark_enable'],
 			'WATERMARK_IMG_FOLDER'			=> $this->config['watermark_img_folder'],
 			'WATERMARK_FILE'				=> $this->config['watermark_file'],
@@ -178,15 +161,8 @@ class acp_controller
 			'WATERMARK_LOCATION'			=> $this->config['watermark_location'],
 			'WATERMARK_LEVEL'				=> $this->config['watermark_level'],
 			'WATERMARK_ORIENTATION'			=> $this->config['watermark_orientation'],
-			'WATERMARK_FORUM_EXCLUDED'		=> $this->forum_select($excluded_forums),
-			'WATERMARK_GD_WARNING'			=> $watermark_gd_warning,
 			'U_ACTION'						=> $this->u_action,
 		]);
-	}
-
-	private function forum_select($value)
-	{
-		return '<select id="watermark_forum_excluded" name="selectForms[]" multiple="multiple" size="10">' . make_forum_select($value, false, true, true) . '</select>';
 	}
 
 	public function rename_folder()

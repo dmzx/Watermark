@@ -11,12 +11,6 @@
 	</div>
 {% endif %}
 
-{% if WATERMARK_GD_WARNING %}
-	<div class="errorbox">
-		<h3>{{ lang('ACP_WATERMARK_WARNING') }}</h3>
-	</div>
-{% endif %}
-
 <form id="dmzx_watermark_acp" name="dmzx_watermark_acp" method="post" action="{{ U_ACTION }}"	enctype="multipart/form-data">
 	<fieldset>
 		<legend>{{ lang('SETTINGS') }}</legend>
@@ -36,23 +30,19 @@
 			<dd><input type="text" id="watermark_file" name="watermark_file" value="{{ WATERMARK_FILE }}" size="40" maxlength="255" /></dd>
 		</dl>
 		<dl>
-			<dt><label for="watermark_scale">{{ lang('ACP_WATERMARK_SCALE') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_SCALE_EXPLAIN') }}</span></dt>
+			<dt><label for="watermark_scale">{{ lang('ACP_WATERMARK_SCALE') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_SCALE_EXPLAIN') }}</span></dt>
 			<dd><input type="number" id="watermark_scale" name="watermark_scale" value="{{ WATERMARK_SCALE }}" size="1" maxlength="1" min="1" /></dd>
 		</dl>
 		<dl>
-			<dt><label for="watermark_level">{{ lang('ACP_WATERMARK_LEVEL') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_LEVEL_EXPLAIN') }}</span></dt>
+			<dt><label for="watermark_level">{{ lang('ACP_WATERMARK_LEVEL') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_LEVEL_EXPLAIN') }}</span></dt>
 			<dd><input type="number" id="watermark_level" name="watermark_level" value="{{ WATERMARK_LEVEL }}" size="1" min="1" max="100"/></dd>
 		</dl>
 		<dl>
-			<dt><label for="watermark_orientation">{{ lang('ACP_WATERMARK_ORIENTATION') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_ORIENTATION_EXPLAIN') }}</span></dt>
+			<dt><label for="watermark_orientation">{{ lang('ACP_WATERMARK_ORIENTATION') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_ORIENTATION_EXPLAIN') }}</span></dt>
 			<dd><input type="number" id="watermark_orientation" name="watermark_orientation" value="{{ WATERMARK_ORIENTATION }}" size="1" min="-180" max="180"/></dd>
 		</dl>
 		<dl>
-			<dt><label>{{ lang('ACP_WATERMARK_FORUM_EXCLUDED') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_FORUM_EXCLUDED_EXPLAIN') }}</span></dt>
-			<dd>{{ WATERMARK_FORUM_EXCLUDED }}</dd>
-		</dl>
-		<dl>
-			<dt><label>{{ lang('ACP_WATERMARK_LOCATION') ~ lang('COLON') }}</label><br><span>{{ lang('ACP_WATERMARK_LOCATION_EXPLAIN') }}</span></dt>
+			<dt><label>{{ lang('ACP_WATERMARK_LOCATION') ~ lang('COLON') }}</label><br /><span>{{ lang('ACP_WATERMARK_LOCATION_EXPLAIN') }}</span></dt>
 			<dd>
 				<select name="watermark_location">
 					<option id="watermark_location_0" value="0" {% if WATERMARK_LOCATION == 0 %}selected="selected"{% endif %}>{{ lang('ACP_WATERMARK_LOCATION_0') }}</option>

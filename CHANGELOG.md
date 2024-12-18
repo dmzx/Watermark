@@ -1,5 +1,11 @@
 ## Watermark Changelog
 
+### 1.0.4 - 2024-11-29
+
+- Added forum exclude in ACP.
+- Added warning if GD is active in ACP.
+- Code update.
+
 ### 1.0.3 - 2021-05-03
 
 - Added support for webp images.
